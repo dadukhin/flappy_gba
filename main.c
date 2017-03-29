@@ -33,7 +33,7 @@ int main()
 	volatile int score = 1;
 	REG_DISPCTL = MODE3 | BG2_ENABLE;
 	int row = 80;
-	int col = 120;
+	int col = 35;
 	int oldrow = row;
 	int oldcol = col;
 	int rdel = 1;
@@ -47,7 +47,8 @@ int main()
 	int bStart[BIRDHEIGHT];
 	int bWidth[BIRDHEIGHT];
 	birdSetup(bStart, bWidth, bINEF);
-
+	volatile int delay = 0;
+	volatile int oldparallax = 0;
 
 
 	for(int i=0; i<3; i++)
@@ -70,6 +71,7 @@ int main()
 drawImage3(0,0,240, 160, background2);
 	while(1)
 	{
+		
 		if(KEY_DOWN_NOW(BUTTON_UP) && !cooldown)
 		{
 		rdel = -10;
@@ -121,25 +123,40 @@ drawImage3(0,0,240, 160, background2);
 
 
 			if (cur->col < -15) {
-					cur->col = 500;	
+					//cur->col = 240 + (i*80) + rand() % 50;
+				cur->col = 500;
+					cur->row = 100+rand() % 50;
+					cur->height = 160-cur->row-1;	
 			cur->passed = 0;
 			}
 			if (cur-> col < col && !cur->passed) {
 			score++;			
 			cur->passed = 1;
 			}
+			if (col >= cur->col && col < cur->col + cur->width) {
+				if (row >= cur->row && row < cur->row+cur->height)
+				{
+					score = -10;
+				}
+			}
 
-		
-
-//add if this obj is taken offscreen set it's col to right edge of screen, set random properties
 		}
 		waitForVblank();
 		//drawRect(oldrow, oldcol, oldsize, oldsize, bgcolor); //cover bird's old pos
-		drawFragment(oldcol, oldrow, BIRDWIDTH, BIRDHEIGHT, background2);
-oldsize++;
-		//drawRect(row, col, size, size, RED); // bird's new pos
+		delay++;
+		if (delay >= 30) {
+			if (oldparallax <= -50) {
+				oldparallax = 0;
+			}
+			drawImage3(oldparallax--,0,240, 100, background2);
+			delay = 0;
+		}
+		//drawImage3(0,0,240, 100, background2);
+		//delay(1);
+		drawFragment(oldcol, oldrow, BIRDWIDTH, BIRDHEIGHT, background2, oldparallax + 1);
+		oldsize++;
+		oldcol = oldcol +0; oldrow= oldrow +0;
 		drawBird(col,row, bStart, bWidth, bINEF);
-		//drawImage3(col,row, 32, 22, bINEF);
 		oldrow = row;
 		oldcol = col;
 		oldsize = size;
@@ -150,8 +167,7 @@ oldsize++;
 
 		if (cur-> col < 240 && cur->col >= -15)
 		{
-		//drawRect(cur->row, cur->col, cur->height, cur->width, bgcolor);
-		drawFragment(cur->col, cur->row, 15, 50, background2);
+		drawFragment(cur->col, cur->row, 15, cur->height, background2, 0);
 		}
 		}
 		for(int i=0; i<3; i++)
@@ -159,14 +175,13 @@ oldsize++;
 		cur = objs + i;
 		if (cur->col < 240 && cur->col >= -15)
 		{
-		//drawRect(cur->row, cur->col, cur->height, cur->width, cur->color);
-		drawRectImage(cur->col,cur->row, 15, 50, pipe2);
+		drawRectImage(cur->col,cur->row, 15, cur->height, pipe2);
 		}
 		oldobjs[i] = objs[i];
 		}
 		//sprintf(buffer, "Score: %d", score);
 		//drawRect(150, 5, 8, 30, CYAN);
-		drawFragment(5, 150, 30, 8, background2);
+		drawFragment(5, 150, 30, 8, background2, 0);
 		drawString(150, 5, numToChar(score, buffer), YELLOW);
 	}
 	

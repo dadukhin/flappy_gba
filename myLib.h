@@ -103,7 +103,7 @@ typedef struct
 void setPixel(int , int , unsigned short );
 void drawRect(int row, int col, int height, int width, unsigned short color);
 void drawImage3(int x, int y, int width, int height, const unsigned short *image);
-void drawFragment(int x, int y, int width, int height, const unsigned short *image);
+void drawFragment(int x, int y, int width, int height, const unsigned short *image, int parallax);
 void drawRectImage(int x, int y, int width, int height, const unsigned short *image);
 void drawBird(int x, int y, int *starts, int *widths, const unsigned short *image);
 void birdSetup(int *starts, int *widths, const unsigned short *image);

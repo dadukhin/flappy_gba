@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "text.h"
 #include "myLib.h"
+#include <stdlib.h>
 
 
 void drawChar(int row, int col, char ch, unsigned short color)
@@ -36,23 +37,34 @@ int num = 1;
 for (int i = 0; i < l; i++) {
 num *=n;
 }
-return num;
+return abs(num);
 }
 
 char* numToChar(int num, char* buffer) {
+
+for (int i = 0; i < 10; i++) {
+	buffer[i] = '\0';
+}
+
 int length = 0;
 int temp = num;
 while (temp !=0) {
 temp = temp/10;
 length++;
 if (length == 3) {
-//num = 300;
+num = 10;
 }
 }
 //always create a pointer to an array buffer so as to avoid read only memory
 //void pointer doesn't know what type the data it points to is
-for (int i = 0; i < length; i++) {
-buffer[i] = (char) (((num/(int)power(10, length - i-1))  % 10) + 48);
+int negative = 0;
+if (num <  0) {
+	buffer[0] = '-';
+	negative = 1;
+}
+num = abs(num);
+for (int i = 0+negative; i < length+negative; i++) {
+buffer[i] = (char) (((num/(int)power(10, length - i-(negative ? 0: 1)))  % 10) + 48);
 }
 return buffer;
 }

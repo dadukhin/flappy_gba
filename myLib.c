@@ -25,7 +25,7 @@ void drawBird(int x, int y, int *starts, int *widths, const unsigned short *imag
 	{
 		int start = starts[i];
 		int widthMOD = widths[i];
-		DMA[3].src = image + 32*i + start;
+		DMA[3].src = image + BIRDWIDTH*i + start;
 		DMA[3].dst = videoBuffer + OFFSET(y+i, x+start, 240);
 		DMA[3].cnt = widthMOD | DMA_SOURCE_INCREMENT | DMA_ON; //INCREMENT
 	}
@@ -89,10 +89,10 @@ for(int i=0; i<height; i++)
 }
 
 
-void drawFragment(int x, int y, int width, int height, const unsigned short *image) {
+void drawFragment(int x, int y, int width, int height, const unsigned short *image, int parallax) {
 for(int i=0; i<height; i++)
 	{
-		DMA[3].src = image + (240*(i+y))+x;
+		DMA[3].src = image + (240*(i+y))+x - parallax;
 		DMA[3].dst = videoBuffer + (y+i) * 240 + x;
 		DMA[3].cnt = width | DMA_SOURCE_INCREMENT | DMA_ON; //INCREMENT
 	}
