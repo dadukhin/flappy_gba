@@ -1,10 +1,10 @@
 /*
  * Exported with nin10kit v1.4
- * Time-stamp: Wednesday 03/29/2017, 14:26:59
+ * Time-stamp: Tuesday 03/28/2017, 18:23:21
  * 
  * Image Information
  * -----------------
- * /home/david/Desktop/background3.png 240@160
+ * /home/david/Desktop/background2.png 240@160
  * 
  * Quote/Fortune of the Day!
  * -------------------------
@@ -16,9 +16,9 @@
 #define BG_H
 
 extern const unsigned short background2[38400];
-#define BACKGROUND3_SIZE 38400
-#define BACKGROUND3_WIDTH 240
-#define BACKGROUND3_HEIGHT 160
+#define BACKGROUND2_SIZE 38400
+#define BACKGROUND2_WIDTH 240
+#define BACKGROUND2_HEIGHT 160
 
 #endif
 

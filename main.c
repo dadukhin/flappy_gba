@@ -49,7 +49,7 @@ int main()
 	birdSetup(bStart, bWidth, bINEF);
 	volatile int delay = 0;
 	volatile int oldparallax = 0;
-
+	int gameOver = 0;
 
 	for(int i=0; i<3; i++)
 	{
@@ -69,9 +69,12 @@ int main()
 	DMA[3].cnt = 38400 | DMA_SOURCE_FIXED | DMA_DESTINATION_INCREMENT | DMA_ON;
 	
 drawImage3(0,0,240, 160, background2);
-	while(1)
+	while(!gameOver)
 	{
-		
+		if(KEY_DOWN_NOW(BUTTON_SELECT)) {
+			//go to title screen
+			//add title screen
+		}
 		if(KEY_DOWN_NOW(BUTTON_UP) && !cooldown)
 		{
 		rdel = -10;
@@ -108,9 +111,9 @@ drawImage3(0,0,240, 160, background2);
 			//row = 0;
 			//rdel = -rdel;
 		}
-		if(row > 159-BIRDHEIGHT+1)
+		if(row > 143-BIRDHEIGHT+1)
 		{
-			row = 159-BIRDHEIGHT+1;
+			row = 143-BIRDHEIGHT+1;
 			rdel = (-1 * rdel) / 2;
 		}
 		for(int i=0; i<3; i++)
@@ -125,8 +128,8 @@ drawImage3(0,0,240, 160, background2);
 			if (cur->col < -15) {
 					//cur->col = 240 + (i*80) + rand() % 50;
 				cur->col = 500;
-					cur->row = 100+rand() % 50;
-					cur->height = 160-cur->row-1;	
+					cur->row = 80+rand() % 50;
+					cur->height = 143-cur->row-1;	
 			cur->passed = 0;
 			}
 			if (cur-> col < col && !cur->passed) {
@@ -136,7 +139,9 @@ drawImage3(0,0,240, 160, background2);
 			if (col >= cur->col && col < cur->col + cur->width) {
 				if (row >= cur->row && row < cur->row+cur->height)
 				{
-					score = -10;
+					//score = -10
+					gameOver = 1;
+
 				}
 			}
 
@@ -167,7 +172,7 @@ drawImage3(0,0,240, 160, background2);
 
 		if (cur-> col < 240 && cur->col >= -15)
 		{
-		drawFragment(cur->col, cur->row, 15, cur->height, background2, 0);
+		drawFragment(cur->col, cur->row, 15, cur->height, background2, oldparallax + 1);
 		}
 		}
 		for(int i=0; i<3; i++)
@@ -183,6 +188,14 @@ drawImage3(0,0,240, 160, background2);
 		//drawRect(150, 5, 8, 30, CYAN);
 		drawFragment(5, 150, 30, 8, background2, 0);
 		drawString(150, 5, numToChar(score, buffer), YELLOW);
+	}
+
+	DMA[3].src = &bgcolor;
+	DMA[3].dst = videoBuffer;
+	DMA[3].cnt = 38400 | DMA_SOURCE_FIXED | DMA_DESTINATION_INCREMENT | DMA_ON;
+	drawString(150, 5, numToChar(score, buffer), YELLOW);
+	while(gameOver) {
+		//add game over screen
 	}
 	
 }
