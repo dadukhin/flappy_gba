@@ -85,6 +85,7 @@ int main()
         {
         case START:
         	drawImage3(0,0,240,160, title);
+        	drawString(160/2, 240/2 - 60/2, "PRESS SELECT", YELLOW);
     		state = START_NODRAW;
             break;
         case START_NODRAW:
@@ -182,10 +183,10 @@ int main()
                     score++;
                     cur->passed = 1;
                 }
-                if (col >= cur->col && col < cur->col + cur->width) {
-                    if (row >= cur->row && row < cur->row+cur->height)
+                if (col + BIRDWIDTH >= cur->col && col < cur->col + cur->width) {
+                    if (row+BIRDHEIGHT >= cur->row && row < cur->row+cur->height)
                     {
-                        //score = -10
+                        score = -10;
                         gameOver++;
 
                     }
