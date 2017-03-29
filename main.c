@@ -6,6 +6,7 @@
 #include "bird3.h"
 #include "pipe2.h"
 #include "title.h"
+#include "go.h"
 
 typedef struct
 {
@@ -23,7 +24,7 @@ enum GBAState {
     START,
     START_NODRAW,
     PLAY,
-    //GAMEOVER
+    GAMEOVER,
 };
 int main()
 {
@@ -57,7 +58,7 @@ int main()
     birdSetup(bStart, bWidth, bINEF);
     volatile int delay = 0;
     volatile int oldparallax = 0;
-    int gameOver = 0;
+    //int gameOver = 0;
 
     for(int i=0; i<3; i++)
     {
@@ -186,8 +187,7 @@ int main()
                 if (col + BIRDWIDTH >= cur->col && col < cur->col + cur->width) {
                     if (row+BIRDHEIGHT >= cur->row && row < cur->row+cur->height)
                     {
-                        score = -10;
-                        gameOver++;
+                        state = GAMEOVER;
 
                     }
                 }
@@ -234,7 +234,26 @@ int main()
             //sprintf(buffer, "Score: %d", score);
             drawFragment(5, 150, 30, 8, background2, 0);
             drawString(150, 5, numToChar(score, buffer), YELLOW);
+
+            if (state == GAMEOVER) {
+            	drawImage3(0,0,240, 160, go);
+            	drawString(160/2 + 50, 240/2, numToChar(score, buffer), BLUE);
+
+            }
+
             break;
+        case GAMEOVER:
+        	
+
+
+        	if(!KEY_DOWN_NOW(BUTTON_SELECT)) {
+        		cooldown = 0;
+        	}
+        	if(KEY_DOWN_NOW(BUTTON_SELECT) && !cooldown) {
+        		cooldown = 1;
+        		state = START;
+        	}
+        	break;
         }
     }
 
