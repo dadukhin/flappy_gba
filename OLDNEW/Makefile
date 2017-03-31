@@ -13,12 +13,12 @@ PROGNAME = GAME
 # that will be compiled into your program. For example
 # if you have main.c and myLib.c then in the following
 # line you would put main.o and myLib.o
-OFILES = main.o myLib.o text.o font.o bg.o bird.o pipe2.o title.o go.o bandp.o
+OFILES = main.o myLib.o text.o font.o bg.o bird3.o pipe2.o title.o go.o
 
 # The header files you have created.
 # This is necessary to determine when to recompile for files.
 # This should be a space (SPACE!) separated list of .h files
-HFILES = myLib.h text.h bg.h bird.h pipe2.h title.h go.h bandp.h
+HFILES = myLib.h text.h bg.h bird3.h pipe2.h title.h go.h
 
 ################################################################################
 # These are various settings used to make the GBA toolchain work

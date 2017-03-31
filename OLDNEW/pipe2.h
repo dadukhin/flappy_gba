@@ -1,10 +1,10 @@
 /*
  * Exported with nin10kit v1.4
- * Time-stamp: Thursday 03/30/2017, 20:36:03
+ * Time-stamp: Tuesday 03/28/2017, 20:23:43
  * 
  * Image Information
  * -----------------
- * /home/david/Desktop/pipe2.png 25@383
+ * /home/david/Desktop/pipe2.png 15@230
  * 
  * Quote/Fortune of the Day!
  * -------------------------
@@ -15,10 +15,10 @@
 #ifndef PIPE2_H
 #define PIPE2_H
 
-extern const unsigned short pipe2[9575];
-#define PIPE2_SIZE 9575
-#define PIPE2_WIDTH 25
-#define PIPE2_HEIGHT 383
+extern const unsigned short pipe2[3450];
+#define PIPE2_SIZE 3450
+#define PIPE2_WIDTH 15
+#define PIPE2_HEIGHT 230
 
 #endif
 

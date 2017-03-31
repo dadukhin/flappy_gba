@@ -1,7 +1,9 @@
 typedef unsigned int u32;
-
+typedef unsigned short u16;
 #define REG_DISPCTL *(unsigned short *)0x4000000
+#define OBJ_ENABLE 0x1000
 #define MODE3 3
+#define MODE1D (1<<6)
 #define BG2_ENABLE (1<<10)
 
 extern unsigned short *videoBuffer; 
@@ -15,11 +17,11 @@ extern unsigned short *videoBuffer;
 #define CYAN COLOR(0, 31, 31)
 #define YELLOW COLOR(31, 31, 0)
 #define BLACK 0
-#define BIRDWIDTH 32
-#define BIRDHEIGHT 22
-
+#define BIRDWIDTH 27
+#define BIRDHEIGHT 19
+#define JUMPVEL 15
 #define OFFSET(r,c,rowlen) ((r)*(rowlen) + (c))
-
+#define OAMMEM  ((OamEntry*)0x7000000)
 // Buttons
 
 #define BUTTON_A		(1<<0)
@@ -69,6 +71,49 @@ typedef struct
 
 #define DMA ((volatile DMA_CONTROLLER *) 0x040000B0)
 
+//SPRITE STUFF
+
+#define SPRITEPAL  ((u16 *)0x5000200)
+typedef struct { u16 tileimg[8192]; } charblock;
+#define CHARBLOCKBASE ((charblock*)0x6000000)
+//define object attribute memory state address
+#define SpriteMem ((unsigned short*)0x7000000) //OAM
+//define object attribute memory image address
+#define SpriteData ((unsigned short*)0x6010000)
+
+
+
+// Bits 8-9 flags Object Mode controls what type of sprite it is, and whether to draw or not (1 and 3 is used for affine sprites)
+#define ATTR0_REG (0<<8) // Default
+#define ATTR0_HIDE (2<<8) // If set the sprite is hidden, by default all sprites are SHOWN
+
+// Bits A-B control Rendering modes.  Alpha blending can be enabled by setting these two bits to 01.
+
+// C controls Mosaic effect if set the sprite will appear pixelated.
+#define ATTR0_MOSAIC (1<<12)
+
+// D Palette Mode
+#define ATTR0_4BPP 0          // 16 colors (16 Palette Banks)
+#define ATTR0_8BPP (1<<13)    // 256 colors (1 Palette of 256 Colors)
+
+// E-F Sprite Shape
+#define ATTR0_SQUARE 0
+#define ATTR0_WIDE (1<<14)
+#define ATTR0_TALL (2<<14)
+
+
+// Flip flags
+#define ATTR1_NOFLIP 0
+#define ATTR1_HFLIP (1<<12)
+#define ATTR1_VFLIP (1<<13)
+
+// Sprite size.  Combined with attribute 0’s shape flag determines the dimensions of the sprite given.
+#define ATTR1_SIZE8 0
+#define ATTR1_SIZE16 (1<<14)
+#define ATTR1_SIZE32 (2<<14)
+#define ATTR1_SIZE64 (3<<14)
+
+
 // Defines
 #define DMA_CHANNEL_0 0
 #define DMA_CHANNEL_1 1
@@ -104,8 +149,12 @@ void setPixel(int , int , unsigned short );
 void drawRect(int row, int col, int height, int width, unsigned short color);
 void drawImage3(int x, int y, int width, int height, const unsigned short *image);
 void drawFragment(int x, int y, int width, int height, const unsigned short *image, int parallax);
+void drawFragmentMoved(int x, int y, int x2, int y2, int width, int height, const unsigned short *image);
 void drawRectImage(int x, int y, int width, int height, const unsigned short *image);
 void drawBird(int x, int y, int *starts, int *widths, const unsigned short *image);
 void birdSetup(int *starts, int *widths, const unsigned short *image);
+void render();
+void hideSprites();
+void renderSprites();
 void delay(int);
 void waitForVblank();

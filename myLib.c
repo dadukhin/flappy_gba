@@ -1,7 +1,7 @@
 #include "myLib.h"
 #include <stdlib.h>
 unsigned short *videoBuffer = (unsigned short *)0x6000000;
-
+extern unsigned short *screenBuffer;
 void setPixel(int row, int col, unsigned short color)
 {
 	videoBuffer[OFFSET(row, col, 240)] = color;
@@ -94,6 +94,17 @@ for(int i=0; i<height; i++)
 	{
 		DMA[3].src = image + (240*(i+y))+x - parallax;
 		DMA[3].dst = videoBuffer + (y+i) * 240 + x;
+		DMA[3].cnt = width | DMA_SOURCE_INCREMENT | DMA_ON; //INCREMENT
+	}
+
+
+}
+
+void drawFragmentMoved(int x, int y, int x2, int y2, int width, int height, const unsigned short *image) {
+for(int i=0; i<height; i++)
+	{
+		DMA[3].src = image + (240*(i+y))+abs(x);
+		DMA[3].dst = videoBuffer + (y2+i) * 240 + abs(x2);
 		DMA[3].cnt = width | DMA_SOURCE_INCREMENT | DMA_ON; //INCREMENT
 	}
 

@@ -51,9 +51,6 @@ int temp = num;
 while (temp !=0) {
 temp = temp/10;
 length++;
-if (length == 3) {
-num = 10;
-}
 }
 //always create a pointer to an array buffer so as to avoid read only memory
 //void pointer doesn't know what type the data it points to is

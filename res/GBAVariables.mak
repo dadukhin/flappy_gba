@@ -9,6 +9,8 @@ CC      := $(CROSS)gcc
 LD      := $(CROSS)ld
 OBJCOPY := $(CROSS)objcopy
 
+OFILES += res/crt0.o res/libc_sbrk.o
+
 ARMINC = /usr/arm-none-eabi/include
 ARMLIB = /usr/arm-none-eabi/lib
 GCCLIB = /usr/lib/gcc/arm-none-eabi/$(GCC_VERSION)

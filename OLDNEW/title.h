@@ -1,10 +1,10 @@
 /*
  * Exported with nin10kit v1.4
- * Time-stamp: Thursday 03/30/2017, 20:36:03
+ * Time-stamp: Wednesday 03/29/2017, 17:32:25
  * 
  * Image Information
  * -----------------
- * /home/david/Desktop/pipe2.png 25@383
+ * /home/david/Desktop/title.png 240@160
  * 
  * Quote/Fortune of the Day!
  * -------------------------
@@ -12,13 +12,13 @@
  * All bug reports / feature requests are to be sent to Brandon (bwhitehead0308@gmail.com)
  */
 
-#ifndef PIPE2_H
-#define PIPE2_H
+#ifndef TITLE_H
+#define TITLE_H
 
-extern const unsigned short pipe2[9575];
-#define PIPE2_SIZE 9575
-#define PIPE2_WIDTH 25
-#define PIPE2_HEIGHT 383
+extern const unsigned short title[38400];
+#define TITLE_SIZE 38400
+#define TITLE_WIDTH 240
+#define TITLE_HEIGHT 160
 
 #endif
 

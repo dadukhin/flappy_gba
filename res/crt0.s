@@ -158,12 +158,9 @@ CEW0Skip:
 @---------------------------------------------------------------------------------
 @ set heap end
 @---------------------------------------------------------------------------------
-@ March 07, 2017
-@ Commenting out this section because fake_heap_end is not defined
-@ Doesn't appear to have any negative effects
-	@ldr	r1, =fake_heap_end
-	@ldr	r0, =__eheap_end
-	@str	r0, [r1]
+	ldr	r1, =fake_heap_end
+	ldr	r0, =__eheap_end
+	str	r0, [r1]
 @---------------------------------------------------------------------------------
 @ global constructors
 @---------------------------------------------------------------------------------
