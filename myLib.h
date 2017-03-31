@@ -6,7 +6,13 @@ typedef unsigned short u16;
 #define MODE1D (1<<6)
 #define BG2_ENABLE (1<<10)
 
-extern unsigned short *videoBuffer; 
+extern unsigned short *videoBuffer;
+typedef enum{
+    START,
+    START_NODRAW,
+    PLAY,
+    GAMEOVER,
+} GBAState;
 
 #define COLOR(r, g, b) ((r) | (g)<<5 | (b)<<10)
 #define WHITE COLOR(31,31,31)
@@ -17,11 +23,18 @@ extern unsigned short *videoBuffer;
 #define CYAN COLOR(0, 31, 31)
 #define YELLOW COLOR(31, 31, 0)
 #define BLACK 0
-#define BIRDWIDTH 27
-#define BIRDHEIGHT 19
-#define JUMPVEL 15
+
+
+#define NUMPIPES 3
+#define PIPEWIDTH 30
+#define BIRDWIDTH 31
+#define BIRDHEIGHT 31
+#define JUMPVEL 10
 #define OFFSET(r,c,rowlen) ((r)*(rowlen) + (c))
 #define OAMMEM  ((OamEntry*)0x7000000)
+
+
+
 // Buttons
 
 #define BUTTON_A		(1<<0)
@@ -153,8 +166,16 @@ void drawFragmentMoved(int x, int y, int x2, int y2, int width, int height, cons
 void drawRectImage(int x, int y, int width, int height, const unsigned short *image);
 void drawBird(int x, int y, int *starts, int *widths, const unsigned short *image);
 void birdSetup(int *starts, int *widths, const unsigned short *image);
+void initGraphics();
+void initSprites();
+void setupOBJS();
+void keyInput(GBAState state);
 void render();
+void moveBird();
 void hideSprites();
+void movePipes();
 void renderSprites();
+void resetVars();
 void delay(int);
+void bgRedraw();
 void waitForVblank();

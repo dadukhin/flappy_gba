@@ -1,26 +1,12 @@
 #include "myLib.h"
 #include <stdlib.h>
 unsigned short *videoBuffer = (unsigned short *)0x6000000;
-extern unsigned short *screenBuffer;
+//extern unsigned short *screenBuffer;
 void setPixel(int row, int col, unsigned short color)
 {
 	videoBuffer[OFFSET(row, col, 240)] = color;
 }
 void drawBird(int x, int y, int *starts, int *widths, const unsigned short *image) {
-
-
-
-/*for (int i = 0; i < height; i++){
-	for (int j = 0; j < width; j++) {
-		if (image[(width * i) +j] != MAGENTA) {
-		videoBuffer[((i+y) * 240) + j + x] =  image[(width * i) + j];
-		}
-		
-	}	
-} 
-*/
-
-
 	for(int i=0; i<BIRDHEIGHT; i++)
 	{
 		int start = starts[i];
