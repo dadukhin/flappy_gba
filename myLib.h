@@ -26,9 +26,10 @@ typedef enum{
 
 
 #define NUMPIPES 3
-#define PIPEWIDTH 30
-#define BIRDWIDTH 31
-#define BIRDHEIGHT 31
+#define BIRDWIDTH 32 
+#define BIRDHEIGHT (32 - 10) //10 is size of magenta
+#define PIPEWIDTH 28
+#define PIPEHEIGHT 64
 #define JUMPVEL 10
 #define OFFSET(r,c,rowlen) ((r)*(rowlen) + (c))
 #define OAMMEM  ((OamEntry*)0x7000000)

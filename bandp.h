@@ -1,7 +1,7 @@
 /*
  * Exported with nin10kit v1.4
  * Invocation command was nin10kit -mode=sprites -bpp=4 -for_bitmap=1 -transparent=FF00FF bandp bird2.png pipe2.png pipe3.png 
- * Time-stamp: Friday 03/31/2017, 14:35:53
+ * Time-stamp: Saturday 04/01/2017, 16:21:33
  * 
  * Image Information
  * -----------------

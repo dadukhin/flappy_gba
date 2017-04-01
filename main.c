@@ -55,7 +55,7 @@ PIPE *cur; //POINTER TO A PIPE OBJ
 
 OamEntry *bird; //BIRD SPRITE OBJ
 OamEntry *pipe;
-
+int collided = 0;
 GBAState state = START;
 /* OLD RENDERING MODE: UNCOMMENT IF SPRITES FAIL
 int oldcol = col;
@@ -103,9 +103,10 @@ int main()
             waitForVblank();
             renderSprites();
             bgRedraw();
-
-            drawString(150, 5, numToChar(score, scoreStr), YELLOW);
-
+            //sprintf(scoreStr, "x:%dy:%d,1x:%d,1y%d,%d", col, row, pipes[0].col, pipes[0].row, collided );
+            //drawString(150, 5, numToChar(score, scoreStr), YELLOW);
+            sprintf(scoreStr, "%d", score);
+            drawString(150, 5, scoreStr, BLACK);
 
             if (state == GAMEOVER) {
                 drawImage3(0,0,240, 160, go);
@@ -161,18 +162,24 @@ void initSprites() {
 void keyInput(GBAState st) {
     if(KEY_DOWN_NOW(BUTTON_SELECT) && !cooldown) {
         state = st;
-        if (st == PLAY) {
+        if (st == START) {
             resetVars();
         }
         cooldown = 1;
     }
-    if(KEY_DOWN_NOW(BUTTON_UP) && !cooldown)
+    if(KEY_DOWN_NOW(BUTTON_UP))
     {
         rVel = -JUMPVEL;
+        row--;
+        cooldown = 1;
+    }
+    if(KEY_DOWN_NOW(BUTTON_DOWN))
+    {
+        row++;
         cooldown = 1;
     }
 
-    if(!KEY_DOWN_NOW(BUTTON_UP) && !KEY_DOWN_NOW(BUTTON_SELECT))
+    if(!KEY_DOWN_NOW(BUTTON_UP) && !KEY_DOWN_NOW(BUTTON_SELECT) && !KEY_DOWN_NOW(BUTTON_DOWN))
     {
         cooldown = 0;
     }
@@ -180,17 +187,19 @@ void keyInput(GBAState st) {
 void setupOBJS() {
     for(int i=0; i<NUMPIPES; i++)
     {
-        pipes[i].row = 110;
-        pipes[i].col = 240 + (i * 50) ;
-        pipes[i].rd = 0; //maybe some pipes move up and down as well
-        pipes[i].cd = -2;
-        pipes[i].width = 30;
-        pipes[i].height = 50;
+    	cur = &pipes[i];
+    	
+        cur->row = 110;
+        cur->col = 240 + (i * 50) ;
+        cur->rd = 0; //maybe some pipes move up and down as well
+        cur->cd = -2;
+        cur->width = 28;
+        cur->height = 64;
         pipe = sprites+1+i;
-        pipe->attr0 = pipes[i].row | BANDP_PALETTE_TYPE | PIPE2_SPRITE_SHAPE | ATTR0_SQUARE;
-        pipe->attr1 = pipes[i].col | (PIPE2_SPRITE_SIZE) | ATTR1_SIZE8;
+        pipe->attr0 = cur->row | BANDP_PALETTE_TYPE | PIPE2_SPRITE_SHAPE | ATTR0_SQUARE;
+        pipe->attr1 = cur->col | (PIPE2_SPRITE_SIZE) | ATTR1_SIZE8;
         pipe->attr2 = PIPE2_PALETTE | PIPE2_ID;
-        pipes[i].sp = pipe;
+        cur->sp = pipe;
     }
 
     //BIRD SPRITE SETUP
@@ -200,13 +209,7 @@ void setupOBJS() {
     bird->attr2 = BIRD2_PALETTE | BIRD2_ID;
 }
 void resetVars() {
-    for(int i=0; i<3; i++)
-    {
-        pipes[i].row = 110;
-        pipes[i].col = 240 + (i * 50) ;
-        pipes[i].rd = 0; //maybe some pipes move up and down as well
-        pipes[i].cd = -2;
-    }
+    setupOBJS();
 
     row = 80;
     col = 35;
@@ -231,52 +234,77 @@ void bgRedraw() {
 
 }
 void moveBird() {
-    rVel = rVel + g;
-    row = row + rVel;
+    //rVel = rVel + g;
+    //row = row + rVel;
 
 
-    if(row > 145-BIRDHEIGHT+1)
+    if(row > 143-BIRDHEIGHT+1)
     {
-        row = 145-BIRDHEIGHT+1;
+        row = 143-BIRDHEIGHT+1;
         rVel = (-1 * rVel) / 2;
     }
-    bird->attr0 = ((row < 0 && (255 + row) >= 160) ? 255 + row : row) | BANDP_PALETTE_TYPE | BIRD2_SPRITE_SHAPE | (0<<8);
+    bird->attr0 = ((row < 0 && (256 + row) >= 160) ? 256 + row : row) | BANDP_PALETTE_TYPE | BIRD2_SPRITE_SHAPE | (0<<8);
     bird->attr1 = col | (BIRD2_SPRITE_SIZE) | ATTR1_SIZE8 ;
 
 }
 void movePipes() {
     for(int i=0; i<NUMPIPES; i++)
     {
+    	//delay(10);
         cur = &pipes[i];
 
         cur->row = cur->row + cur->rd;
-        cur->col += cur->cd;
+        cur->col = cur->col + cur->cd;
 
 
         if (cur->col < -64) {
             //cur->col = 240 + (i*80) + rand() % 50;
             cur->col = 400; //if you go too high the sprite will wrap
-            cur->row = 100+rand() % 60;
-            cur->height = 144-cur->row-1;
+            
+            int type = rand() % 2;
+            if (type) {
+            	cur->row = 100+rand() % 60;
+            	cur->sp->attr2 = PIPE2_PALETTE | PIPE2_ID;
+            	cur->height = 144-cur->row-1;
+            	/*cur->row = 0; //-rand() % 50
+            	cur->sp->attr2 = PIPE3_PALETTE | PIPE3_ID;
+            	cur->height = 64;
+            	*/
+            } else {
+            	cur->row = 0 - rand() % 50;
+            	cur->sp->attr2 = PIPE3_PALETTE | PIPE3_ID;
+            	cur->height = 64; //cause the sprite is drawn from the top
+            }
+            
+            
             cur->passed = 0;
         }
         if (cur-> col < col && !cur->passed) {
             score++;
             cur->passed = 1;
         }
-        if (col + BIRDWIDTH >= cur->col && col < cur->col + cur->width) {
-            if (row+BIRDHEIGHT >= cur->row && row < cur->row+cur->height)
+        if (i == 0) {
+        	collided = cur->col;
+        }
+        
+        if (col + BIRDWIDTH >= cur->col && col <= (cur->col + cur->width)) { //&& col < (cur->col + cur->width)
+        	
+
+            if (row+BIRDHEIGHT >= cur->row && row <= cur->row+cur->height)
             {
                 state = GAMEOVER;
+               
 
-            }
+            } 
+
+        	
         }
 
 
 
 
-        cur->sp->attr0 = cur->row | BANDP_PALETTE_TYPE | PIPE2_SPRITE_SHAPE | ATTR0_SQUARE;
-        cur->sp->attr1 = ((cur->col < 0 && (511+cur->col) > 400) ? 511+cur->col: cur->col) | (PIPE2_SPRITE_SIZE) | ATTR1_SIZE8;
+        cur->sp->attr0 = cur->row < 0 ? 256+cur->row : cur->row | BANDP_PALETTE_TYPE | PIPE2_SPRITE_SHAPE | ATTR0_SQUARE;
+        cur->sp->attr1 = ((cur->col < 0 && (512+cur->col) > 400) ? 512+cur->col: cur->col) | (PIPE2_SPRITE_SIZE) | ATTR1_SIZE8;
 
     }
 }
