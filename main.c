@@ -45,7 +45,8 @@ volatile int suspend = 0;
 int row = 80; //BIRD Y position
 int col = 35; //BIRD X position
 
-int rVel, cVel = 1; //BIRD X AND Y VELOCITY
+int rVel = 1; //BIRD X AND Y VELOCITY
+int cVel = 0;
 const int g = 1; //VELOCITY ADDEND (ACCELERATION)
 char scoreStr[100]; //BUFFER HOLDS STRING VERSION OF SCORE
 
@@ -106,15 +107,15 @@ int main()
             //sprintf(scoreStr, "x:%dy:%d,1x:%d,1y%d,%d", col, row, pipes[0].col, pipes[0].row, collided );
             //drawString(150, 5, numToChar(score, scoreStr), YELLOW);
             sprintf(scoreStr, "%d", score);
-            drawString(150, 5, scoreStr, BLACK);
+            drawString(150, 5, scoreStr, YELLOW);
 
             if (state == GAMEOVER) {
                 drawImage3(0,0,240, 160, go);
-                drawString(160/2 + 50, 240/2, numToChar(score, scoreStr), BLUE);
+                //drawString(160/2 + 50, 240/2, numToChar(score, scoreStr), BLUE);
+                drawString(150, 5, scoreStr, BLUE);
                 hideSprites();
                 renderSprites();
             }
-//25% or more body fat males
             break;
         case GAMEOVER:
 
@@ -167,21 +168,23 @@ void keyInput(GBAState st) {
         }
         cooldown = 1;
     }
-    if(KEY_DOWN_NOW(BUTTON_UP))
+    if(KEY_DOWN_NOW(BUTTON_UP) && !cooldown)
     {
         rVel = -JUMPVEL;
-        row--;
+        //row--;
         cooldown = 1;
     }
-    if(KEY_DOWN_NOW(BUTTON_DOWN))
+    if(KEY_DOWN_NOW(BUTTON_RIGHT) && !cooldown)
     {
-        row++;
+        //row++;
+        cVel = 10;
         cooldown = 1;
     }
 
-    if(!KEY_DOWN_NOW(BUTTON_UP) && !KEY_DOWN_NOW(BUTTON_SELECT) && !KEY_DOWN_NOW(BUTTON_DOWN))
+    if(!KEY_DOWN_NOW(BUTTON_UP) && !KEY_DOWN_NOW(BUTTON_SELECT) && !KEY_DOWN_NOW(BUTTON_RIGHT))
     {
         cooldown = 0;
+        //cVel = 0;
     }
 }
 void setupOBJS() {
@@ -193,8 +196,8 @@ void setupOBJS() {
         cur->col = 240 + (i * 50) ;
         cur->rd = 0; //maybe some pipes move up and down as well
         cur->cd = -2;
-        cur->width = 28;
-        cur->height = 64;
+        cur->width = PIPEWIDTH;
+        cur->height = PIPEHEIGHT;
         pipe = sprites+1+i;
         pipe->attr0 = cur->row | BANDP_PALETTE_TYPE | PIPE2_SPRITE_SHAPE | ATTR0_SQUARE;
         pipe->attr1 = cur->col | (PIPE2_SPRITE_SIZE) | ATTR1_SIZE8;
@@ -234,8 +237,15 @@ void bgRedraw() {
 
 }
 void moveBird() {
-    //rVel = rVel + g;
-    //row = row + rVel;
+    rVel = rVel + g;
+    row = row + rVel;
+
+    cVel = cVel - g;
+    col = col + cVel;
+    if (col < 35) {
+    	col = 35;
+    	cVel = 0;
+    }
 
 
     if(row > 143-BIRDHEIGHT+1)
@@ -243,6 +253,9 @@ void moveBird() {
         row = 143-BIRDHEIGHT+1;
         rVel = (-1 * rVel) / 2;
     }
+    if ( row < -30) {
+    	row = -30;
+    } 
     bird->attr0 = ((row < 0 && (256 + row) >= 160) ? 256 + row : row) | BANDP_PALETTE_TYPE | BIRD2_SPRITE_SHAPE | (0<<8);
     bird->attr1 = col | (BIRD2_SPRITE_SIZE) | ATTR1_SIZE8 ;
 
@@ -250,7 +263,6 @@ void moveBird() {
 void movePipes() {
     for(int i=0; i<NUMPIPES; i++)
     {
-    	//delay(10);
         cur = &pipes[i];
 
         cur->row = cur->row + cur->rd;
@@ -258,8 +270,8 @@ void movePipes() {
 
 
         if (cur->col < -64) {
-            //cur->col = 240 + (i*80) + rand() % 50;
-            cur->col = 400; //if you go too high the sprite will wrap
+            cur->col = 240 + (i*80) + rand() % 50;
+            //cur->col = 400; //if you go too high the sprite will wrap
             
             int type = rand() % 2;
             if (type) {
@@ -273,7 +285,7 @@ void movePipes() {
             } else {
             	cur->row = 0 - rand() % 50;
             	cur->sp->attr2 = PIPE3_PALETTE | PIPE3_ID;
-            	cur->height = 64; //cause the sprite is drawn from the top
+            	cur->height = PIPEHEIGHT; //cause the sprite is drawn from the top
             }
             
             
