@@ -198,6 +198,7 @@ void setupOBJS() {
         cur->cd = -2;
         cur->width = PIPEWIDTH;
         cur->height = PIPEHEIGHT;
+        cur->passed = 0;
         pipe = sprites+1+i;
         pipe->attr0 = cur->row | BANDP_PALETTE_TYPE | PIPE2_SPRITE_SHAPE | ATTR0_SQUARE;
         pipe->attr1 = cur->col | (PIPE2_SPRITE_SIZE) | ATTR1_SIZE8;
@@ -237,7 +238,16 @@ void bgRedraw() {
 
 }
 void moveBird() {
-    rVel = rVel + g;
+    
+    
+    if (rVel > 0) {
+    	if (pLax % 2 == 0) {
+			rVel = rVel + g;
+    }
+    	
+    } else {
+    	rVel = rVel + g;
+    }
     row = row + rVel;
 
     cVel = cVel - g;
