@@ -34,7 +34,7 @@ typedef struct
 OamEntry sprites[128];
 
 
-
+u16 currKey, prevKey;
 
 
 //////////////////GAME VARS/////////////////////////
@@ -105,7 +105,7 @@ int main()
             renderSprites();
             bgRedraw();
             //sprintf(scoreStr, "x:%dy:%d,1x:%d,1y%d,%d", col, row, pipes[0].col, pipes[0].row, collided );
-            drawString(150, 5, numToChar(score, scoreStr), YELLOW);
+            //drawString(100, 5, numToChar(score, scoreStr), BLACK);
             //sprintf(scoreStr, "%d", score);
             //drawString(150, 5, scoreStr, YELLOW);
 
@@ -161,31 +161,28 @@ void initSprites() {
     DMA[3].cnt = BANDP_SIZE | DMA_ON;
 }
 void keyInput(GBAState st) {
-    if(KEY_DOWN_NOW(BUTTON_SELECT) && !cooldown) {
+	currKey = ~BUTTONS & 0x03FF;
+	if(!(currKey & BUTTON_SELECT) && !(currKey & BUTTON_A) && !(currKey & BUTTON_RIGHT))
+    {
+        cooldown = 0;
+    }
+    else if(currKey & BUTTON_SELECT && !(prevKey & BUTTON_SELECT)) { //KEY_DOWN_NOW(BUTTON_SELECT)
         state = st;
         if (st == START) {
             resetVars();
         }
         cooldown = 1;
+    } else if (currKey & BUTTON_A && !(prevKey & BUTTON_A)) {
+    	if (currKey & BUTTON_RIGHT) {
+    		cVel = 10;
+    	}
+    	rVel = -JUMPVEL;
+    	cooldown = 1;
+    } else if (currKey & BUTTON_RIGHT && !(prevKey & BUTTON_RIGHT)) {
+    	cVel = 10;
+    	cooldown = 1;
     }
-    if(KEY_DOWN_NOW(BUTTON_UP) && !cooldown)
-    {
-        rVel = -JUMPVEL;
-        //row--;
-        cooldown = 1;
-    }
-    if(KEY_DOWN_NOW(BUTTON_RIGHT) && !cooldown)
-    {
-        //row++;
-        cVel = 10;
-        cooldown = 1;
-    }
-
-    if(!KEY_DOWN_NOW(BUTTON_UP) && !KEY_DOWN_NOW(BUTTON_SELECT) && !KEY_DOWN_NOW(BUTTON_RIGHT))
-    {
-        cooldown = 0;
-        //cVel = 0;
-    }
+    prevKey = currKey;
 }
 void setupOBJS() {
     for(int i=0; i<NUMPIPES; i++)
@@ -225,16 +222,22 @@ void bgRedraw() {
         pLax = 0;
 
     }
-    drawFragmentMoved(abs(pLax),0,0,0,240+pLax, 160, background2);
-
+    drawFragmentMoved(abs(pLax),0,0,0,240+pLax, 160, background2); //DRAW LEFT
+     //have to use these weird numbers because of mode 3 : /
+    //drawString(150, 0, numToChar(score, scoreStr), BLACK); //HAVE TO DRAW SCORE HERE
+    
+   
 
     if (pLax != 0 ) {
-        drawFragmentMoved(0,0, 240+pLax -1, 0, abs(pLax), 160, background2);
+        drawFragmentMoved(0,0, 240+pLax -1, 0, abs(pLax), 160, background2); //DRAW RIGHT
+
     }
 
+		
 
 
     pLax--;
+    drawString(150, 240/2 - 10, numToChar(score, scoreStr), BLACK);
 
 }
 void moveBird() {
@@ -250,7 +253,15 @@ void moveBird() {
     }
     row = row + rVel;
 
-    cVel = cVel - g;
+    if (cVel < 0) {
+    	if (pLax % 7 == 0) {
+    		cVel = cVel - g;
+    	}
+    	
+    } else {
+    	cVel = cVel - g;
+    }
+    
     col = col + cVel;
     if (col < 35) {
     	col = 35;
