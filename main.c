@@ -105,9 +105,9 @@ int main()
             renderSprites();
             bgRedraw();
             //sprintf(scoreStr, "x:%dy:%d,1x:%d,1y%d,%d", col, row, pipes[0].col, pipes[0].row, collided );
-            //drawString(150, 5, numToChar(score, scoreStr), YELLOW);
-            sprintf(scoreStr, "%d", score);
-            drawString(150, 5, scoreStr, YELLOW);
+            drawString(150, 5, numToChar(score, scoreStr), YELLOW);
+            //sprintf(scoreStr, "%d", score);
+            //drawString(150, 5, scoreStr, YELLOW);
 
             if (state == GAMEOVER) {
                 drawImage3(0,0,240, 160, go);
