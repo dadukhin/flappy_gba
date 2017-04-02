@@ -53,6 +53,10 @@ while (temp !=0) {
 temp = temp/10;
 length++;
 }
+
+if (num == 0) {
+	length = 1;
+}
 //always create a pointer to an array buffer so as to avoid read only memory
 //void pointer doesn't know what type the data it points to is
 int negative = 0;
