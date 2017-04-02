@@ -1,12 +1,29 @@
+//DAVID SOLODUKHIN
 typedef unsigned int u32;
 typedef unsigned short u16;
-#define REG_DISPCTL *(unsigned short *)0x4000000
-#define OBJ_ENABLE 0x1000
-#define MODE3 3
-#define MODE1D (1<<6)
-#define BG2_ENABLE (1<<10)
 
-extern unsigned short *videoBuffer;
+
+typedef struct {
+    u16 attr0;
+    u16 attr1;
+    u16 attr2;
+    u16 fill;
+} OamEntry;
+
+typedef struct
+{
+    int row;
+    int col;
+    int rd;
+    int cd;
+    int width;
+    int height;
+    int passed;
+    unsigned short color;
+    OamEntry *sp;
+} PIPE;
+
+
 typedef enum{
     START,
     START_NODRAW,
@@ -14,6 +31,25 @@ typedef enum{
     GAMEOVER,
 } GBAState;
 
+typedef struct
+{
+	const volatile void *src;
+	void *dst;
+	unsigned int cnt;
+} DMA_CONTROLLER;
+
+typedef struct { u16 tileimg[8192]; } charblock;
+//REG_DISCNT
+extern unsigned short *videoBuffer;
+#define REG_DISPCTL *(unsigned short *)0x4000000
+#define OBJ_ENABLE 0x1000
+#define MODE3 3
+#define MODE1D (1<<6)
+#define BG2_ENABLE (1<<10)
+
+
+
+//COLORS
 #define COLOR(r, g, b) ((r) | (g)<<5 | (b)<<10)
 #define WHITE COLOR(31,31,31)
 #define RED COLOR(31,0,0)
@@ -24,7 +60,7 @@ typedef enum{
 #define YELLOW COLOR(31, 31, 0)
 #define BLACK 0
 
-
+//GAME CONSTANTS
 #define NUMPIPES 3
 #define BIRDWIDTH 27 
 #define BIRDHEIGHT (20) //10 is size of magenta
@@ -76,19 +112,13 @@ typedef enum{
 #define REG_DMA3DAD         *(volatile u32*)0x40000D8       // destination address
 #define REG_DMA3CNT         *(volatile u32*)0x40000DC       // control register
 
-typedef struct
-{
-	const volatile void *src;
-	void *dst;
-	unsigned int cnt;
-} DMA_CONTROLLER;
+
 
 #define DMA ((volatile DMA_CONTROLLER *) 0x040000B0)
 
-//SPRITE STUFF
+//SPRITES
 
 #define SPRITEPAL  ((u16 *)0x5000200)
-typedef struct { u16 tileimg[8192]; } charblock;
 #define CHARBLOCKBASE ((charblock*)0x6000000)
 //define object attribute memory state address
 #define SpriteMem ((unsigned short*)0x7000000) //OAM

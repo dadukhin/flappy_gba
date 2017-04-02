@@ -1,3 +1,4 @@
+//DAVID SOLODUKHIN
 #include "myLib.h"
 #include <stdlib.h>
 unsigned short *videoBuffer = (unsigned short *)0x6000000;
@@ -66,6 +67,7 @@ for(int i=0; i<height; i++)
 void drawImage3(int x, int y, int width, int height, const unsigned short *image) {
 for(int i=0; i<height; i++)
 	{
+		DMA[3].cnt = 0;
 		DMA[3].src = image + width*i;
 		DMA[3].dst = videoBuffer + OFFSET(y+i, x, 240);
 		DMA[3].cnt = width | DMA_SOURCE_INCREMENT | DMA_ON; //INCREMENT
@@ -89,6 +91,7 @@ for(int i=0; i<height; i++)
 void drawFragmentMoved(int x, int y, int x2, int y2, int width, int height, const unsigned short *image) {
 for(int i=0; i<height; i++)
 	{
+		DMA[3].cnt = 0;
 		DMA[3].src = image + (240*(i+y))+abs(x);
 		DMA[3].dst = videoBuffer + (y2+i) * 240 + abs(x2);
 		DMA[3].cnt = width | DMA_SOURCE_INCREMENT | DMA_ON; //INCREMENT
@@ -130,5 +133,5 @@ void delay(int n)
 void waitForVblank()
 {
 	while(SCANLINECOUNTER >= 160);
-	while(SCANLINECOUNTER<160);
+	while(SCANLINECOUNTER < 160);
 }

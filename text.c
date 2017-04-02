@@ -1,3 +1,4 @@
+//DAVID SOLODUKHIN
 #include <stdio.h>
 #include "text.h"
 #include "myLib.h"

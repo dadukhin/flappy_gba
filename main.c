@@ -1,35 +1,15 @@
+//DAVID SOLODUKHIN
 #include "myLib.h"
 #include "text.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include "bg.h"
-//#include "bird.h"
-//#include "pipe2.h"
 #include "title.h"
 #include "go.h"
 #include "bandp.h"
+#include "bg2.h"
+#include "play.h"
 
-
-
-typedef struct {
-    u16 attr0;
-    u16 attr1;
-    u16 attr2;
-    u16 fill;
-} OamEntry;
-
-typedef struct
-{
-    int row;
-    int col;
-    int rd;
-    int cd;
-    int width;
-    int height;
-    int passed;
-    unsigned short color;
-    OamEntry *sp;
-} PIPE;
 
 OamEntry sprites[128];
 
@@ -58,6 +38,8 @@ OamEntry *bird; //BIRD SPRITE OBJ
 OamEntry *pipe;
 int collided = 0;
 GBAState state = START;
+int doop = 0;
+short color = GREEN;
 /* OLD RENDERING MODE: UNCOMMENT IF SPRITES FAIL
 int oldcol = col;
 int oldrow = row;
@@ -77,6 +59,10 @@ int main()
     birdSetup(bStart, bWidth, bird2);
 
     */
+    unsigned int seed = 79827348;
+	
+	srand(seed);
+	doop = rand() % 10;
     initGraphics();
     setupOBJS();
     ///////////
@@ -88,13 +74,29 @@ int main()
         {
         case START:
             drawImage3(0,0,240,160, title);
-            drawString(160/2, 240/2 - 60/2, "PRESS SELECT", YELLOW);
+            drawString(160/2, 240/2 - 72/2, "PRESS SELECT", YELLOW);
+            drawRect(98, 240/2 -60/2 - 2, 33,56, GREEN);
+            drawImage3(240/2- 60/2, 100 , 52, 29, play);
             state = START_NODRAW;
             hideSprites();
             renderSprites();
             break;
         case START_NODRAW:
             keyInput(PLAY);
+            //delay(10);
+            waitForVblank();
+            if (collided <= 60) {
+            	color = BLUE;
+            } else if (collided <= 120){
+            	color = RED;
+            }
+            if (collided > 120) {
+            	collided = 0;
+            }
+            collided++;
+            drawRect(98, 240/2 -60/2 - 2, 33,56, color);
+            drawImage3(240/2- 60/2, 100 , 52, 29, play);
+            
             break;
         case PLAY:
 
@@ -216,20 +218,21 @@ void resetVars() {
     col = 35;
     pLax = 0;
     score = 0;
+    doop = rand() % 10;
 }
 void bgRedraw() {
     if (pLax < -239) {
         pLax = 0;
 
     }
-    drawFragmentMoved(abs(pLax),0,0,0,240+pLax, 160, background2); //DRAW LEFT
+    drawFragmentMoved(abs(pLax),0,0,0,240+pLax, 160, doop % 2 == 0? background2: bg2); //DRAW LEFT
      //have to use these weird numbers because of mode 3 : /
     //drawString(150, 0, numToChar(score, scoreStr), BLACK); //HAVE TO DRAW SCORE HERE
     
    
 
     if (pLax != 0 ) {
-        drawFragmentMoved(0,0, 240+pLax -1, 0, abs(pLax), 160, background2); //DRAW RIGHT
+        drawFragmentMoved(0,0, 240+pLax -1, 0, abs(pLax), 160, doop % 2 == 0 ? background2: bg2); //DRAW RIGHT
 
     }
 
@@ -296,7 +299,7 @@ void movePipes() {
             
             int type = rand() % 2;
             if (type) {
-            	cur->row = 100+rand() % 60;
+            	cur->row = 100+rand() % 40;
             	cur->sp->attr2 = PIPE2_PALETTE | PIPE2_ID;
             	cur->height = 144-cur->row-1;
             	/*cur->row = 0; //-rand() % 50
