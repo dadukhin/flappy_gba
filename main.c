@@ -36,10 +36,11 @@ PIPE *cur; //POINTER TO A PIPE OBJ
 
 OamEntry *bird; //BIRD SPRITE OBJ
 OamEntry *pipe;
-int collided = 0;
+int cSwitch = 0;
 GBAState state = START;
-int doop = 0;
+int bgRand = 0;
 short color = GREEN;
+unsigned int seed = 79827348;
 /* OLD RENDERING MODE: UNCOMMENT IF SPRITES FAIL
 int oldcol = col;
 int oldrow = row;
@@ -59,10 +60,8 @@ int main()
     birdSetup(bStart, bWidth, bird2);
 
     */
-    unsigned int seed = 79827348;
-	
 	srand(seed);
-	doop = rand() % 10;
+	bgRand = rand() % 10;
     initGraphics();
     setupOBJS();
     ///////////
@@ -74,7 +73,7 @@ int main()
         {
         case START:
             drawImage3(0,0,240,160, title);
-            drawString(160/2, 240/2 - 72/2, "PRESS SELECT", YELLOW);
+            drawString(160/2, 240/2 - 50/2, "PRESS A", YELLOW);
             drawRect(98, 240/2 -60/2 - 2, 33,56, GREEN);
             drawImage3(240/2- 60/2, 100 , 52, 29, play);
             state = START_NODRAW;
@@ -85,15 +84,15 @@ int main()
             keyInput(PLAY);
             //delay(10);
             waitForVblank();
-            if (collided <= 60) {
+            if (cSwitch <= 30) {
             	color = BLUE;
-            } else if (collided <= 120){
+            } else if (cSwitch <= 60){
             	color = RED;
             }
-            if (collided > 120) {
-            	collided = 0;
+            if (cSwitch > 60) {
+            	cSwitch = 0;
             }
-            collided++;
+            cSwitch++;
             drawRect(98, 240/2 -60/2 - 2, 33,56, color);
             drawImage3(240/2- 60/2, 100 , 52, 29, play);
             
@@ -105,8 +104,15 @@ int main()
             movePipes();
             waitForVblank();
             renderSprites();
-            bgRedraw();
-            //sprintf(scoreStr, "x:%dy:%d,1x:%d,1y%d,%d", col, row, pipes[0].col, pipes[0].row, collided );
+
+            if (bgRand & 1) {
+            	bgRedraw(bg2);
+            } else {
+            	bgRedraw(background2);
+            }
+
+            
+            //sprintf(scoreStr, "x:%dy:%d,1x:%d,1y%d,%d", col, row, pipes[0].col, pipes[0].row, cSwitch );
             //drawString(100, 5, numToChar(score, scoreStr), BLACK);
             //sprintf(scoreStr, "%d", score);
             //drawString(150, 5, scoreStr, YELLOW);
@@ -114,7 +120,19 @@ int main()
             if (state == GAMEOVER) {
                 drawImage3(0,0,240, 160, go);
                 //drawString(160/2 + 50, 240/2, numToChar(score, scoreStr), BLUE);
-                drawString(150, 5, scoreStr, BLUE);
+                char * test = "SCORE: ";
+                //int x = 0;
+                //while (scoreStr[x] != '\0') {
+                //	x++;
+                //}
+                for (int x = 5; x >= 0; x--) { //5 cause a score of 10^4 is impossible
+                	scoreStr[x+7] = scoreStr[x]; //7 cause length of score: 
+                }
+                for (int i = 0; i < 7; i++) {
+                	*(scoreStr + (i)) = test[i];
+                }
+                
+                drawString(130, 240/2 - (6 * 10) /2, scoreStr, BLUE);
                 hideSprites();
                 renderSprites();
             }
@@ -180,6 +198,9 @@ void keyInput(GBAState st) {
     	}
     	rVel = -JUMPVEL;
     	cooldown = 1;
+    	if (st == PLAY) {
+    		state = st;
+    	}
     } else if (currKey & BUTTON_RIGHT && !(prevKey & BUTTON_RIGHT)) {
     	cVel = 10;
     	cooldown = 1;
@@ -218,21 +239,23 @@ void resetVars() {
     col = 35;
     pLax = 0;
     score = 0;
-    doop = rand() % 10;
+    //srand(seed % 7);
+    bgRand = rand() % 10;
+
 }
-void bgRedraw() {
+void bgRedraw(unsigned short * bg) {
     if (pLax < -239) {
         pLax = 0;
 
     }
-    drawFragmentMoved(abs(pLax),0,0,0,240+pLax, 160, doop % 2 == 0? background2: bg2); //DRAW LEFT
+    drawFragmentMoved(abs(pLax),0,0,0,240+pLax, 160, bg); //DRAW LEFT
      //have to use these weird numbers because of mode 3 : /
     //drawString(150, 0, numToChar(score, scoreStr), BLACK); //HAVE TO DRAW SCORE HERE
     
    
 
     if (pLax != 0 ) {
-        drawFragmentMoved(0,0, 240+pLax -1, 0, abs(pLax), 160, doop % 2 == 0 ? background2: bg2); //DRAW RIGHT
+        drawFragmentMoved(0,0, 240+pLax -1, 0, abs(pLax), 160, bg); //DRAW RIGHT
 
     }
 
@@ -269,6 +292,8 @@ void moveBird() {
     if (col < 35) {
     	col = 35;
     	cVel = 0;
+    } else if (col > 239) {
+    	col = 239;
     }
 
 
@@ -318,9 +343,6 @@ void movePipes() {
         if (cur-> col < col && !cur->passed) {
             score++;
             cur->passed = 1;
-        }
-        if (i == 0) {
-        	collided = cur->col;
         }
         
         if (col + BIRDWIDTH >= cur->col && col <= (cur->col + cur->width)) { //&& col < (cur->col + cur->width)
