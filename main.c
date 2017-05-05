@@ -82,7 +82,6 @@ int main()
             break;
         case START_NODRAW:
             keyInput(PLAY);
-            //delay(10);
             waitForVblank();
             if (cSwitch <= 30) {
             	color = BLUE;
@@ -111,7 +110,6 @@ int main()
             	bgRedraw(background2);
             }
 
-            
             //sprintf(scoreStr, "x:%dy:%d,1x:%d,1y%d,%d", col, row, pipes[0].col, pipes[0].row, cSwitch );
             //drawString(100, 5, numToChar(score, scoreStr), BLACK);
             //sprintf(scoreStr, "%d", score);
@@ -133,6 +131,7 @@ int main()
                 }
                 
                 drawString(130, 240/2 - (6 * 10) /2, scoreStr, BLUE);
+                drawString(20, 240/2 - (6 * 21) /2, "PRESS SELECT TO RESTART", BLACK);
                 hideSprites();
                 renderSprites();
             }
@@ -145,13 +144,6 @@ int main()
     }
 
 
-}
-void render()
-{
-    /*DMA[3].src = screenBuffer;
-    DMA[3].dst = videoBuffer;
-    DMA[3].cnt = 38400 | DMA_SOURCE_INCREMENT | DMA_ON;
-    */
 }
 void hideSprites() {
     for (int i = 0; i < 128; i++) {
@@ -239,6 +231,8 @@ void resetVars() {
     col = 35;
     pLax = 0;
     score = 0;
+    cVel = 0;
+    rVel = -10;
     //srand(seed % 7);
     bgRand = rand() % 10;
 
@@ -294,6 +288,7 @@ void moveBird() {
     	cVel = 0;
     } else if (col > 239) {
     	col = 239;
+    	cVel = 0;
     }
 
 
